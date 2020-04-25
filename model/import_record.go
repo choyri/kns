@@ -4,8 +4,8 @@ import "time"
 
 type ImportRecord struct {
 	ID        uint
-	StartDate time.Time
-	EndDate   time.Time
+	StartDate string
+	EndDate   string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

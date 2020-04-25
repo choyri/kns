@@ -7,4 +7,5 @@ import (
 
 func InitRoute() {
 	http.HandleFunc("/", controller.Index)
+	http.HandleFunc("/import", controller.Import)
 }
