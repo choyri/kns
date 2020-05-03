@@ -118,7 +118,7 @@ func createOrders(tx *gorm.DB, file *excelize.File, importRecordID uint) error {
 			}
 		}
 
-		records = append(records, model.Order{
+		record := model.Order{
 			ImportRecordID:        importRecordID,
 			CustomerName:          row[fieldMap[FieldNameCustomerName]],
 			Salesman:              row[fieldMap[FieldNameSalesman]],
@@ -134,7 +134,11 @@ func createOrders(tx *gorm.DB, file *excelize.File, importRecordID uint) error {
 			Color:                 row[fieldMap[FieldNameColor]],
 			ColorNumber:           row[fieldMap[FieldNameColorNumber]],
 			CustomerVersionNumber: row[fieldMap[FieldNameCustomerVersionNumber]],
-		})
+		}
+
+		record.TrimSpace()
+
+		records = append(records, record)
 	}
 
 	err = gormbulk.BulkInsert(tx, records, 500)

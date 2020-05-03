@@ -23,3 +23,15 @@ const (
 	FieldNameColorNumber           = "色號"
 	FieldNameCustomerVersionNumber = "客戶版號"
 )
+
+var SearchFields = []string{
+	"customer_order_number",
+	"brand",
+	"order_number",
+	"product_name_code",
+	"product_name_chinese",
+	"product_name_english",
+	"color",
+	"color_number",
+	"customer_version_number",
+}
