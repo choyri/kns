@@ -35,3 +35,17 @@ var SearchFields = []string{
 	"color_number",
 	"customer_version_number",
 }
+
+var ExportTitles = []interface{}{
+	"序號",
+	"LAB NO",
+	"客戶單號",
+	"品牌",
+	"訂單號碼",
+	"序號",
+	"品名代碼",
+	"成分",
+	"規格描述",
+	"顏色",
+	"客戶版號",
+}
