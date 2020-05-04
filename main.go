@@ -5,6 +5,7 @@ import (
 	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"github.com/choyri/kns/store"
 	_ "github.com/joho/godotenv/autoload"
+	"github.com/rs/cors"
 	"log"
 	"net/http"
 	"os"
@@ -22,7 +23,10 @@ func init() {
 }
 
 func main() {
-	server := http.Server{Addr: ":8080"}
+	server := http.Server{
+		Addr:    ":60080",
+		Handler: cors.Default().Handler(http.DefaultServeMux),
+	}
 
 	go func() {
 		if err := server.ListenAndServe(); err != nil {
