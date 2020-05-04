@@ -14,35 +14,47 @@ import (
 	"strings"
 )
 
-func ImportFromReader(r io.Reader) error {
+func ImportFromReader(r io.Reader) (uint, error) {
 	file, err := excelize.OpenReader(r)
 	if err != nil {
-		return fmt.Errorf("解析 XLSX 时出现了错误：%w", err)
+		return 0, fmt.Errorf("解析 XLSX 时出现了错误：%w", err)
 	}
 
 	_, err = isFileValid(file)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	var (
 		tx             = store.GetMySQL().Begin()
 		importRecordID uint
+		originalAmount uint
+		currentAmount  uint
 	)
 
 	defer tx.Rollback()
 
+	originalAmount = getOrderAmount(tx)
+
 	importRecordID, err = createImportRecord(tx, file)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	err = createOrders(tx, file, importRecordID)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
-	return tx.Commit().Error
+	currentAmount = getOrderAmount(tx)
+
+	return currentAmount - originalAmount, tx.Commit().Error
+}
+
+func getOrderAmount(tx *gorm.DB) uint {
+	var ret uint
+	tx.Model(&model.Order{}).Count(&ret)
+	return ret
 }
 
 func createImportRecord(tx *gorm.DB, file *excelize.File) (uint, error) {

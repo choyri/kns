@@ -1,8 +1,10 @@
 package controller
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/choyri/kns/service"
+	"github.com/choyri/kns/support"
 	"net/http"
 	"strings"
 )
@@ -24,15 +26,21 @@ func Import(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	filenames := strings.Split(fileHeader.Filename, ".")
-	if len(filenames) == 0 || filenames[len(filenames)-1] != "xlsx" {
-		http.Error(w, "文件格式错误，需要 .xlsx 类型", http.StatusBadRequest)
+	if len(filenames) == 0 || support.InStringSlice(filenames[len(filenames)-1], []string{"xlsx", "xls"}) == false {
+		http.Error(w, "文件格式错误，需要 xlsx/xls 类型", http.StatusBadRequest)
+		return
 	}
 
-	err = service.ImportFromReader(file)
+	rowsAffected, err := service.ImportFromReader(file)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	w.WriteHeader(http.StatusCreated)
+	w.Header().Set("Content-Type", "application/json")
+
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
+		"amount": rowsAffected,
+	})
 }
