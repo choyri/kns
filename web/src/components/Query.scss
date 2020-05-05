@@ -1,0 +1,63 @@
+.input {
+  margin-bottom: 2rem;
+}
+
+.keyword-input {
+  margin-bottom: 30vh;
+
+  &.sideways {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+}
+
+.search-result {
+  height: 100%;
+  width: 90%;
+  margin: 0 auto 1rem;
+
+  &.for-export-1 {
+    margin-bottom: calc(167px + 1rem);
+  }
+
+  &.for-export-2 {
+    margin-bottom: calc(216px + 1rem);
+  }
+
+  &.for-export-3 {
+    margin-bottom: calc(236px + 1rem);
+  }
+
+  .el-table__fixed-right {
+    right: 1px;
+  }
+}
+
+.export-data {
+  position: fixed;
+  bottom: -190px;
+  width: 100vw;
+  padding: 1rem 0;
+  box-shadow: -1px 0 8px #d3d4d6;
+  background-color: #fff;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all .3s;
+
+  &.show {
+    bottom: 0;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    width: 90%;
+    margin-bottom: 1rem;
+  }
+
+  .el-table {
+    width: 90%;
+  }
+}
