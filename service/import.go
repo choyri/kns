@@ -110,6 +110,14 @@ func createOrders(tx *gorm.DB, file *excelize.File, importRecordID uint) error {
 		rowLen  = len(rows)
 	)
 
+	getFieldValue := func(row []string, fieldMap map[string]int, field string) string {
+		x, exists := fieldMap[field]
+		if !exists {
+			return ""
+		}
+		return row[x]
+	}
+
 	for k, row := range rows {
 		if k < HeaderLines {
 			continue
@@ -132,20 +140,20 @@ func createOrders(tx *gorm.DB, file *excelize.File, importRecordID uint) error {
 
 		record := model.Order{
 			ImportRecordID:        importRecordID,
-			CustomerName:          row[fieldMap[FieldNameCustomerName]],
-			Salesman:              row[fieldMap[FieldNameSalesman]],
-			CustomerOrderNumber:   row[fieldMap[FieldNameCustomerOrderNumber]],
-			Brand:                 row[fieldMap[FieldNameBrand]],
-			OrderNumber:           row[fieldMap[FieldNameOrderNumber]],
-			SerialNumber:          support.Str2Uint(row[fieldMap[FieldNameSerialNumber]]),
-			ProductNameCode:       row[fieldMap[FieldNameProductNameCode]],
-			ProductNameChinese:    row[fieldMap[FieldNameProductNameChinese]],
-			ProductNameEnglish:    row[fieldMap[FieldNameProductNameEnglish]],
-			Ingredient:            row[fieldMap[FieldNameIngredient]],
-			Specification:         row[fieldMap[FieldNameSpecification]],
-			Color:                 row[fieldMap[FieldNameColor]],
-			ColorNumber:           row[fieldMap[FieldNameColorNumber]],
-			CustomerVersionNumber: row[fieldMap[FieldNameCustomerVersionNumber]],
+			CustomerName:          getFieldValue(row, fieldMap, FieldNameCustomerName),
+			Salesman:              getFieldValue(row, fieldMap, FieldNameSalesman),
+			CustomerOrderNumber:   getFieldValue(row, fieldMap, FieldNameCustomerOrderNumber),
+			Brand:                 getFieldValue(row, fieldMap, FieldNameBrand),
+			OrderNumber:           getFieldValue(row, fieldMap, FieldNameOrderNumber),
+			SerialNumber:          support.Str2Uint(getFieldValue(row, fieldMap, FieldNameSerialNumber)),
+			ProductNameCode:       getFieldValue(row, fieldMap, FieldNameProductNameCode),
+			ProductNameChinese:    getFieldValue(row, fieldMap, FieldNameProductNameChinese),
+			ProductNameEnglish:    getFieldValue(row, fieldMap, FieldNameProductNameEnglish),
+			Ingredient:            getFieldValue(row, fieldMap, FieldNameIngredient),
+			Specification:         getFieldValue(row, fieldMap, FieldNameSpecification),
+			Color:                 getFieldValue(row, fieldMap, FieldNameColor),
+			ColorNumber:           getFieldValue(row, fieldMap, FieldNameColorNumber),
+			CustomerVersionNumber: getFieldValue(row, fieldMap, FieldNameCustomerVersionNumber),
 		}
 
 		record.TrimSpace()
