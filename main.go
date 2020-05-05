@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"github.com/choyri/kns/store"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/rs/cors"
@@ -46,16 +45,4 @@ func main() {
 	if err := server.Shutdown(ctx); err != nil {
 		log.Fatalf("shutdown 失败：%s", err)
 	}
-}
-
-func main11() {
-	f, err := excelize.OpenFile("Book1.xlsx")
-	if err != nil {
-		println(err.Error())
-		return
-	}
-
-	f.Save()
-
-	excelize.NewFile()
 }
