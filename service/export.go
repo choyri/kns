@@ -36,7 +36,7 @@ func getRecords(ids []uint) ([]model.Order, error) {
 		dataMap[v.ID] = data[k]
 	}
 
-	ret := make([]model.Order, len(data))
+	ret := make([]model.Order, len(ids))
 
 	for k, v := range ids {
 		ret[k] = dataMap[v]
@@ -71,7 +71,7 @@ func newXlSX(records []model.Order) (file *os.File, err error) {
 	}
 
 	for k, v := range data {
-		//v := v
+		v := v
 		axis, _ = excelize.JoinCellName("A", k)
 
 		err = f.SetSheetRow(SheetName, axis, &v)
