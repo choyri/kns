@@ -6,11 +6,16 @@ import (
 	"github.com/choyri/kns/model"
 	"github.com/choyri/kns/service"
 	"github.com/choyri/kns/store"
+	"github.com/choyri/kns/support"
 	"golang.org/x/sync/errgroup"
+	"math"
 	"net/http"
 	"sort"
+	"strconv"
 	"strings"
 )
+
+const defaultPerPage = 20
 
 func Search(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
@@ -22,6 +27,8 @@ func Search(w http.ResponseWriter, r *http.Request) {
 		err     error
 		queries = r.URL.Query()
 		q       = queries.Get("q")
+		page    = queries.Get("page")
+		perPage = queries.Get("per_page")
 		records []model.Order
 	)
 
@@ -31,8 +38,16 @@ func Search(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	ret, headers := disposeResult(records, page, perPage)
+
 	w.Header().Set("Content-Type", "application/json")
-	_ = json.NewEncoder(w).Encode(records)
+	w.Header().Set("Access-Control-Expose-Headers", "*")
+
+	for k, v := range headers {
+		w.Header().Set(k, v)
+	}
+
+	_ = json.NewEncoder(w).Encode(ret)
 }
 
 func search(q string) ([]model.Order, error) {
@@ -112,4 +127,50 @@ func search(q string) ([]model.Order, error) {
 	sort.Sort(ret)
 
 	return ret, nil
+}
+
+func disposeResult(records []model.Order, pageStr, perPageStr string) ([]model.Order, map[string]string) {
+	page := int(support.Str2Uint(pageStr))
+	if page == 0 {
+		page = 1
+	}
+
+	perPage := int(support.Str2Uint(perPageStr))
+	if perPage == 0 {
+		perPage = defaultPerPage
+	}
+
+	totalPage := int(math.Ceil(float64(len(records)) / float64(perPage)))
+	if page > totalPage {
+		page = totalPage
+	}
+
+	startIndex, endIndex := perPage*(page-1), perPage*page
+	if endIndex > len(records) {
+		endIndex = len(records)
+	}
+
+	ret := make([]model.Order, len(records[startIndex:endIndex]))
+	copy(ret, records[startIndex:endIndex])
+
+	nextPage := totalPage
+	if nextPage > page {
+		nextPage = page + 1
+	}
+
+	prevPage := page - 1
+	if prevPage == 0 {
+		prevPage = page
+	}
+
+	headers := map[string]string{
+		"X-Total":       strconv.Itoa(len(records)),
+		"X-Total-Pages": strconv.Itoa(totalPage),
+		"X-Per-Page":    strconv.Itoa(perPage),
+		"X-Page":        strconv.Itoa(page),
+		"X-Next-Page":   strconv.Itoa(nextPage),
+		"X-Prev-Page":   strconv.Itoa(prevPage),
+	}
+
+	return ret, headers
 }

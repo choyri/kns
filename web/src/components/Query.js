@@ -1,5 +1,5 @@
 import React from 'react'
-import {Button} from 'element-react'
+import {Button, Pagination} from 'element-react'
 import Search from './Search'
 import Order from './Order'
 import {search, exportData} from '../fetch'
@@ -9,9 +9,16 @@ import './Query.scss'
 class Query extends React.Component {
     state = {
         isSearched: false,
-        searchResults: [],
+        searchResult: {
+            lists: [],
+            total: 0,
+            page: 1,
+            perPage: 0,
+        },
         exportData: [],
     }
+
+    keyword = ''
 
     disposeSearchResultClassName = () => {
         let ret = ['search-result']
@@ -28,17 +35,54 @@ class Query extends React.Component {
         return ret.join(' ')
     }
 
+    handleKeywordChange = keyword => {
+        this.keyword = keyword
+    }
+
     handleSearch = keyword => {
+        keyword || (keyword = this.keyword)
+
         if (keyword === '') {
-            this.setState({searchResults: []})
+            let searchResult = this.state.searchResult
+            searchResult.lists = []
+            searchResult.total = 0
+            this.setState({searchResult})
             return
         }
 
-        search(keyword).then(results => {
-            this.setState({searchResults: results})
-            if (!this.state.isSearched) {
-                this.setState({isSearched: true})
+        const {page, perPage} = this.state.searchResult
+
+        search(keyword, page, perPage).then(({results, headers}) => {
+            const searchResult = {
+                lists: results,
+                total: parseInt(headers.get('X-Total')),
+                page: parseInt(headers.get('X-Page')),
+                perPage: parseInt(headers.get('X-Per-Page')),
             }
+
+            let data = {searchResult}
+
+            if (!this.state.isSearched) {
+                data.isSearched = true
+            }
+
+            this.setState(data)
+        })
+    }
+
+    handlePerPageChange = perPage => {
+        let searchResult = this.state.searchResult
+        searchResult.perPage = perPage
+        this.setState({searchResult}, () => {
+            this.handleSearch()
+        })
+    }
+
+    handleCurrentPageChange = page => {
+        let searchResult = this.state.searchResult
+        searchResult.page = page
+        this.setState({searchResult}, () => {
+            this.handleSearch()
         })
     }
 
@@ -66,20 +110,29 @@ class Query extends React.Component {
     }
 
     render() {
-        const {isSearched, searchResults, exportData} = this.state
+        const {isSearched, searchResult, exportData} = this.state
 
         return (
             <main>
                 <Search
                     className={isSearched ? 'sideways' : ''}
+                    onKeywordChange={this.handleKeywordChange}
                     onSearch={this.handleSearch}
                 />
 
                 {isSearched && <div className={this.disposeSearchResultClassName()}>
                     <Order
-                        data={searchResults}
+                        data={searchResult.lists}
                         onPitch={this.handlePitch}
                         canPitch
+                    />
+                    <Pagination
+                        layout="sizes, prev, pager, next, total"
+                        total={searchResult.total}
+                        pageSize={searchResult.perPage}
+                        currentPage={searchResult.page}
+                        onSizeChange={this.handlePerPageChange}
+                        onCurrentChange={this.handleCurrentPageChange}
                     />
                 </div>}
 
