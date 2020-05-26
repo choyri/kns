@@ -22,11 +22,22 @@ function visitBackend() {
     return _fetch('', {returnRawErr: true})
 }
 
-function search(keyword) {
-    const url = `/search?q=${encodeURIComponent(keyword)}`
+function search(keyword, page, perPage) {
+    let url = `/search?q=${encodeURIComponent(keyword)}`
+
+    if (page > 0) {
+        url += '&page=' + page
+    }
+
+    if (perPage > 0) {
+        url += '&per_page=' + perPage
+    }
 
     return _fetch(url)
-        .then(resp => resp.json())
+        .then(resp => resp.json().then(results => ({
+            results,
+            headers: resp.headers,
+        })))
 }
 
 function exportData(ids) {

@@ -2,17 +2,19 @@ import React from 'react'
 import {Input, Button} from 'element-react'
 
 class Search extends React.Component {
-    state = {
-        keyword: '',
-    }
+    keyword = ''
 
     handleKeywordChange = keyword => {
-        this.setState({keyword})
+        this.keyword = keyword
+        this.props.onKeywordChange(keyword)
+    }
+
+    handleButtonClick = () => {
+        this.props.onSearch(this.keyword)
     }
 
     render() {
-        const {keyword} = this.state
-        const {className, onSearch} = this.props
+        const {className} = this.props
 
         return (
             <Input
@@ -21,9 +23,10 @@ class Search extends React.Component {
                 size="large"
                 autoFocus
                 trim
-                value={keyword}
                 onChange={this.handleKeywordChange}
-                append={<Button icon="search" onClick={onSearch.bind(this, keyword)}>搜索</Button>}
+                append={
+                    <Button icon="search" onClick={this.handleButtonClick}>搜索</Button>
+                }
             />
         )
     }
