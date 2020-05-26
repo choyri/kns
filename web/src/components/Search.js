@@ -4,9 +4,16 @@ import {Input, Button} from 'element-react'
 class Search extends React.Component {
     keyword = ''
 
-    handleKeywordChange = keyword => {
-        this.keyword = keyword
-        this.props.onKeywordChange(keyword)
+    handleKeywordChange = event => {
+        this.keyword = event.target.value
+        this.props.onKeywordChange(this.keyword)
+    }
+
+    handleKeyPress = event => {
+        if (event.key === 'Enter') {
+            event.target.blur()
+            this.props.onSearch(this.keyword)
+        }
     }
 
     handleButtonClick = () => {
@@ -23,7 +30,8 @@ class Search extends React.Component {
                 size="large"
                 autoFocus
                 trim
-                onChange={this.handleKeywordChange}
+                onBlur={this.handleKeywordChange}
+                onKeyPress={this.handleKeyPress}
                 append={
                     <Button icon="search" onClick={this.handleButtonClick}>搜索</Button>
                 }
