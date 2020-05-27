@@ -17,6 +17,11 @@ func Export(ids []uint) (file *os.File, err error) {
 		return
 	}
 
+	err = store.GetMySQL().Create(&model.ExportRecord{Amount: uint(len(records))}).Error
+	if err != nil {
+		err = fmt.Errorf("创建 export_records 失败：%w", err)
+	}
+
 	return newXlSX(records)
 }
 
