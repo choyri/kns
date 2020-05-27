@@ -1,4 +1,4 @@
-const BACKEND_URL = 'http://localhost:60080'
+const BACKEND_URL = '/api'
 
 const IMPORT_URL = BACKEND_URL + '/import'
 
