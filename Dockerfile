@@ -8,7 +8,7 @@ RUN go env -w GOPROXY=https://goproxy.cn,direct \
     && go mod download \
     && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o kns
 
-FROM golang:alpine
+FROM scratch
 
 COPY --from=builder /tmp/build/kns /kns
 
